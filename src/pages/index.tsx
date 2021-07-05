@@ -1,7 +1,7 @@
 // SPA loading Data useEffect
 // SSR use getServerSideProps
 // SSG use getStaticProps
-
+import { useContext } from "react";
 import { GetStaticProps } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -10,6 +10,7 @@ import pt from "date-fns/locale/pt";
 
 import api from "../services/api";
 import { convertDurationToTimeString } from "../utils/convertDurationToTimeString";
+import { PlayerContext } from "../context/PlayerContext";
 
 import styles from "./home.module.scss";
 
@@ -17,7 +18,7 @@ type Episode = {
   id: string;
   title: string;
   members: string;
-  duration: string;
+  duration: number;
   url: string;
   durationAsString: string;
   publishedAt: string;
@@ -30,12 +31,8 @@ type HomeProps = {
 };
 
 export default function Home({ allEpisodes, latestEpisodes }: HomeProps) {
-  /*   useEffect(() => {
-    fetch('http://localhost:3333/episodes')
-    .then(response => response.json())
-    .then(data => console.log(data))
-  }, [])
- */
+  const { play } = useContext(PlayerContext);
+
   return (
     <div className={styles.homepage}>
       <section className={styles.latestEpisodes}>
@@ -50,6 +47,7 @@ export default function Home({ allEpisodes, latestEpisodes }: HomeProps) {
                   src={episode.thumbnail}
                   alt={episode.title}
                   objectFit="cover"
+                  placeholder="blur"
                 />
 
                 <div className={styles.episodeDetails}>
@@ -61,7 +59,7 @@ export default function Home({ allEpisodes, latestEpisodes }: HomeProps) {
                   <span>{episode.durationAsString}</span>
                 </div>
 
-                <button type="button">
+                <button type="button" onClick={() => play(episode)}>
                   <img src="/play-green.svg" alt="Tocar episódio" />
                 </button>
               </li>
@@ -104,7 +102,7 @@ export default function Home({ allEpisodes, latestEpisodes }: HomeProps) {
                   <td style={{ width: 100 }}>{episode.publishedAt}</td>
                   <td>{episode.durationAsString}</td>
                   <td>
-                    <button type="button">
+                    <button type="button" onClick={() => play(episode)}>
                       <img src="/play-green.svg" alt="Tocar epsódio" />
                     </button>
                   </td>
